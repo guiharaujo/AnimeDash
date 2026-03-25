@@ -169,13 +169,16 @@ if page == "Inicio":
 
     with col1:
         st.subheader("Top 10 Animes Mais Assistidos")
-        top10 = df.nlargest(10, "popularidade")[["titulo", "popularidade"]].copy()
-        top10["titulo"] = top10["titulo"].str[:30]
-        fig = px.bar(top10, x="popularidade", y="titulo", orientation="h",
-                     color="popularidade", color_continuous_scale="Viridis",
-                     labels={"popularidade": "Popularidade", "titulo": ""})
-        fig.update_layout(yaxis={"categoryorder": "total ascending"}, showlegend=False)
-        st.plotly_chart(fig, use_container_width=True)
+        top10 = df.nlargest(10, "popularidade")[["titulo", "capa_url", "popularidade"]].reset_index(drop=True)
+        for i in range(0, 10, 2):
+            c_a, c_b = st.columns(2)
+            for col_card, idx in zip([c_a, c_b], [i, i + 1]):
+                if idx < len(top10):
+                    row = top10.iloc[idx]
+                    with col_card:
+                        if row["capa_url"]:
+                            st.image(row["capa_url"], width=80)
+                        st.caption(f"#{idx+1} {row['titulo']}")
 
     with col2:
         st.subheader("Nota x Popularidade")
