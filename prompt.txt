@@ -1,0 +1,26 @@
+Crie um projeto Python completo chamado "AnimeDash" que:
+
+1. Conecte na API GraphQL da AniList (https://graphql.anilist.co)
+   - Gratuita e sem necessidade de chave de API
+
+2. Crie um banco de dados SQL Server chamado "AnimeDash" com tabelas para:
+   - Animes (id, titulo, titulo_original, generos, nota, popularidade, 
+     episodios, status, temporada, ano, estudio, descricao, capa_url)
+   - Tags (id, nome, descricao)
+   - Anime_Tags (id_anime, id_tag)
+
+3. Busque e salve os top 500 animes da AniList no banco
+
+4. Crie um dashboard Streamlit com:
+   - Página inicial com estatísticas gerais
+   - Ranking dos top animes por nota e popularidade
+   - Gráficos por gênero, estúdio e ano/temporada
+   - Busca de anime por nome
+   - Sistema de recomendação: usuário digita um anime 
+     e recebe 10 sugestões baseadas em gênero e tags similares
+
+5. Use a connection string:
+   Server=localhost;Database=AnimeDash;Trusted_Connection=yes;
+   TrustServerCertificate=yes;
+
+Tecnologias: Python, requests, pyodbc, streamlit, plotly
