@@ -43,20 +43,25 @@ Animes/
 - Tabelas: `Animes`, `Tags`, `Anime_Tags`
 - Inicializar schema: `sqlcmd -S localhost -No -i database/schema.sql`
 
-## Como rodar
+## Acesso online
+
+O app está publicado gratuitamente em:
+**https://animedash.streamlit.app/**
+
+## Como rodar localmente
 
 ```bash
 # 1. Instalar dependências
 pip install -r requirements.txt
 
-# 2. Criar banco (apenas na primeira vez)
-sqlcmd -S localhost -No -i database/schema.sql
+# 2. Iniciar dashboard (banco SQLite já incluso no repo)
+streamlit run app/main.py
+```
 
-# 3. Popular banco com 500 animes (leva ~2 minutos)
-python run_etl.py
-
-# 4. Iniciar dashboard
-streamlit run app/main.py --server.headless true
+Para atualizar os dados da AniList no banco local:
+```bash
+python run_etl.py  # grava em animedash.db
+git add animedash.db && git commit -m "update db" && git push origin main
 ```
 
 ## Regras de desenvolvimento
@@ -72,6 +77,7 @@ git push origin main
 ```
 
 Repositório: https://github.com/guiharaujo/AnimeDash
+App online: https://animedash.streamlit.app/
 
 ### Não quebre estas coisas
 

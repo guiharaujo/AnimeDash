@@ -25,7 +25,7 @@ Dashboard interativo dos top 500 animes da [AniList](https://anilist.co), com si
 ## Acesso online (gratuito)
 
 O dashboard está publicado no Streamlit Community Cloud:
-**https://animedash.streamlit.app**
+**https://animedash.streamlit.app/**
 
 ## Pré-requisitos (execução local)
 
