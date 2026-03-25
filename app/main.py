@@ -97,6 +97,14 @@ def _search_animes(conn, name):
 # Carregar dados uma vez no session_state
 # ---------------------------------------------------------------------------
 
+DATA_VERSION = "v3"
+
+# Força recarga se session_state estiver com chaves de versão antiga
+if st.session_state.get("_data_version") != DATA_VERSION:
+    for k in list(st.session_state.keys()):
+        del st.session_state[k]
+    st.session_state["_data_version"] = DATA_VERSION
+
 if "conn" not in st.session_state:
     try:
         st.session_state.conn = get_connection()
@@ -104,18 +112,22 @@ if "conn" not in st.session_state:
         st.error(f"Erro ao conectar: {e}")
         st.stop()
 
-if "data_loaded" not in st.session_state:
+if "df" not in st.session_state:
     try:
         c = st.session_state.conn
         st.session_state.df = _load_all_animes(c)
         st.session_state.tags_df = _load_anime_tags(c)
         st.session_state.stats = _load_stats(c)
-        st.session_state.data_loaded = True
     except Exception as e:
-        st.error(f"Erro ao carregar dados: {e}")
         import traceback
+        st.error(f"Erro ao carregar dados: {e}")
         st.code(traceback.format_exc())
         st.stop()
+
+# Garante que as chaves existem antes de usar
+if "df" not in st.session_state or "tags_df" not in st.session_state or "stats" not in st.session_state:
+    st.error("Dados nao carregados. Recarregue a pagina.")
+    st.stop()
 
 conn = st.session_state.conn
 df = st.session_state.df
