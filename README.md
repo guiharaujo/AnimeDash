@@ -22,13 +22,16 @@ Dashboard interativo dos top 500 animes da [AniList](https://anilist.co), com si
 | pandas / numpy | Manipulação de dados |
 | requests | Chamadas à AniList GraphQL API |
 
-## Pré-requisitos
+## Acesso online (gratuito)
+
+O dashboard está publicado no Streamlit Community Cloud:
+**https://animedash.streamlit.app**
+
+## Pré-requisitos (execução local)
 
 - Python 3.10+
-- SQL Server (local) com autenticação Windows
-- ODBC Driver 17 ou 18 for SQL Server — [download](https://learn.microsoft.com/pt-br/sql/connect/odbc/download-odbc-driver-for-sql-server)
 
-## Instalação e execução
+## Instalação e execução local
 
 ```bash
 # 1. Clonar o repositório
@@ -38,17 +41,21 @@ cd AnimeDash
 # 2. Instalar dependências
 pip install -r requirements.txt
 
-# 3. Criar o banco de dados (apenas na primeira vez)
-sqlcmd -S localhost -No -i database/schema.sql
-
-# 4. Popular o banco com os top 500 animes (~2 minutos)
-python run_etl.py
-
-# 5. Iniciar o dashboard
-streamlit run app/main.py --server.headless true
+# 3. Iniciar o dashboard (banco SQLite já incluído no repositório)
+streamlit run app/main.py
 ```
 
 Acesse em: **http://localhost:8501**
+
+## Atualizar os dados (opcional)
+
+Para rebuscar os 500 animes mais recentes da AniList (requer Python + dependências):
+
+```bash
+python run_etl.py
+```
+
+O ETL grava no arquivo `animedash.db` (SQLite). Após atualizar, commite o arquivo e faça push para o GitHub — o Streamlit Cloud vai redeployar automaticamente.
 
 ## Estrutura do projeto
 
@@ -75,10 +82,7 @@ AnimeDash/
 
 ## Banco de dados
 
-**Connection string:**
-```
-Server=localhost;Database=AnimeDash;Trusted_Connection=yes;TrustServerCertificate=yes;
-```
+O banco é um arquivo **SQLite** (`animedash.db`) incluído no repositório — sem necessidade de servidor.
 
 **Tabelas:**
 

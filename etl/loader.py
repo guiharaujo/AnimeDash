@@ -9,19 +9,12 @@ def load_all(raw_animes: list[dict]) -> None:
     conn = get_connection()
     try:
         for i, raw in enumerate(raw_animes):
-            # Upsert anime
-            anime = transform_anime(raw)
-            upsert_anime(conn, anime)
-
-            # Upsert tags
+            upsert_anime(conn, transform_anime(raw))
             for tag in transform_tags(raw):
                 upsert_tag(conn, tag)
-
-            # Upsert anime-tag relations
             for at in transform_anime_tags(raw):
                 upsert_anime_tag(conn, at)
 
-            # Commit every BATCH_SIZE records
             if (i + 1) % BATCH_SIZE == 0:
                 conn.commit()
                 print(f"  Commit: {i + 1}/{len(raw_animes)} registros salvos")

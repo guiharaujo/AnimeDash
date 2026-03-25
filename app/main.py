@@ -7,8 +7,6 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-import pyodbc
-
 from database.connection import get_connection
 
 st.set_page_config(
@@ -50,22 +48,22 @@ def _load_stats(conn):
     cur.execute("SELECT COUNT(*) FROM Animes")
     total = cur.fetchone()[0]
 
-    cur.execute("SELECT AVG(CAST(nota AS FLOAT)) FROM Animes WHERE nota IS NOT NULL")
+    cur.execute("SELECT AVG(nota) FROM Animes WHERE nota IS NOT NULL")
     avg = cur.fetchone()[0] or 0.0
 
-    cur.execute("""
-        SELECT TOP 1 value, COUNT(*) cnt FROM Animes
-        CROSS APPLY STRING_SPLIT(generos, ',')
-        WHERE generos IS NOT NULL AND generos != ''
-        GROUP BY value ORDER BY cnt DESC
-    """)
-    row = cur.fetchone()
-    top_genre = row[0].strip() if row else "N/A"
+    # Top genre em Python (SQLite nao tem STRING_SPLIT)
+    from collections import Counter
+    cur.execute("SELECT generos FROM Animes WHERE generos IS NOT NULL AND generos != ''")
+    genre_counter = Counter()
+    for (g,) in cur.fetchall():
+        for genre in g.split(", "):
+            genre_counter[genre.strip()] += 1
+    top_genre = genre_counter.most_common(1)[0][0] if genre_counter else "N/A"
 
     cur.execute("""
-        SELECT TOP 1 estudio, COUNT(*) cnt FROM Animes
+        SELECT estudio, COUNT(*) cnt FROM Animes
         WHERE estudio IS NOT NULL AND estudio != ''
-        GROUP BY estudio ORDER BY cnt DESC
+        GROUP BY estudio ORDER BY cnt DESC LIMIT 1
     """)
     row = cur.fetchone()
     top_studio = row[0] if row else "N/A"

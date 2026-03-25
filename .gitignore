@@ -11,3 +11,4 @@ build/
 Thumbs.db
 *.log
 .claude/
+# NAO ignorar animedash.db - precisa ir pro GitHub para o Streamlit Cloud
