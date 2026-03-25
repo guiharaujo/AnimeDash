@@ -218,6 +218,8 @@ if page == "Inicio":
                 if idx < len(top10):
                     row = top10.iloc[idx]
                     with col_card:
+                        if row["capa_url"]:
+                            st.image(row["capa_url"], width=80)
                         with st.popover(f"#{idx+1} {row['titulo'][:22]}"):
                             _render_anime_popup(row, df)
 
