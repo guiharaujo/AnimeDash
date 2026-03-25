@@ -189,11 +189,17 @@ if page == "Inicio":
         fig2.update_traces(marker={"size": 5, "opacity": 0.7})
         st.plotly_chart(fig2, use_container_width=True)
 
-    st.subheader("Distribuicao por Status")
-    sc = df["status"].value_counts().reset_index()
-    sc.columns = ["Status", "Qtd"]
-    fig3 = px.pie(sc, values="Qtd", names="Status", hole=0.4)
-    st.plotly_chart(fig3, use_container_width=True)
+    st.subheader("Top 5 Animes com Mais Episodios")
+    top5_eps = df[df["episodios"].notna()].nlargest(5, "episodios")[["titulo", "capa_url", "episodios"]].reset_index(drop=True)
+    cols_eps = st.columns(5)
+    for i, col_card in enumerate(cols_eps):
+        if i < len(top5_eps):
+            row = top5_eps.iloc[i]
+            with col_card:
+                if row["capa_url"]:
+                    st.image(row["capa_url"], use_container_width=True)
+                st.caption(f"**#{i+1}** {row['titulo']}")
+                st.caption(f"{int(row['episodios'])} eps")
 
 # ---------------------------------------------------------------------------
 # PAGINA: Ranking
