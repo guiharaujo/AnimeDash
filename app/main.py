@@ -168,12 +168,12 @@ if page == "Inicio":
     col1, col2 = st.columns(2)
 
     with col1:
-        st.subheader("Top 10 Generos")
-        gs = df["generos"].dropna().str.split(", ").explode().str.strip()
-        gc = gs.value_counts().head(10).reset_index()
-        gc.columns = ["Genero", "Qtd"]
-        fig = px.bar(gc, x="Qtd", y="Genero", orientation="h",
-                     color="Qtd", color_continuous_scale="Viridis")
+        st.subheader("Top 10 Animes Mais Assistidos")
+        top10 = df.nlargest(10, "popularidade")[["titulo", "popularidade"]].copy()
+        top10["titulo"] = top10["titulo"].str[:30]
+        fig = px.bar(top10, x="popularidade", y="titulo", orientation="h",
+                     color="popularidade", color_continuous_scale="Viridis",
+                     labels={"popularidade": "Popularidade", "titulo": ""})
         fig.update_layout(yaxis={"categoryorder": "total ascending"}, showlegend=False)
         st.plotly_chart(fig, use_container_width=True)
 
