@@ -86,6 +86,48 @@ def _load_stats(conn):
     }
 
 
+def _render_anime_popup(row, df):
+    """Conteudo do popover ao clicar em um anime."""
+    c_img, c_info = st.columns([1, 2])
+    with c_img:
+        if row["capa_url"]:
+            st.image(row["capa_url"], width=120)
+    with c_info:
+        st.markdown(f"**{row['titulo']}**")
+        if row["titulo_original"]:
+            st.caption(row["titulo_original"])
+        eps  = f"{int(row['episodios'])} eps" if row["episodios"] else "Em andamento"
+        nota = f"{row['nota']:.0f}/100"       if row["nota"]      else "N/A"
+        st.write(f"Episodios: **{eps}**")
+        st.write(f"Nota: **{nota}**")
+        st.write(f"Generos: {row['generos'] or 'N/A'}")
+        st.write(f"Estudio: {row['estudio'] or 'N/A'}")
+
+    if row["descricao"]:
+        st.caption(str(row["descricao"])[:300] + "...")
+
+    # 1 anime recomendado por genero
+    generos_anime = set(str(row["generos"] or "").split(", "))
+    candidatos = df[df["id"] != row["id"]].copy()
+    candidatos["match"] = candidatos["generos"].apply(
+        lambda g: len(generos_anime & set(str(g or "").split(", ")))
+    )
+    rec = candidatos[candidatos["match"] > 0].sort_values(
+        ["match", "nota"], ascending=False
+    ).iloc[0] if not candidatos[candidatos["match"] > 0].empty else None
+
+    if rec is not None:
+        st.divider()
+        st.write("**Recomendado:**")
+        r1, r2 = st.columns([1, 3])
+        with r1:
+            if rec["capa_url"]:
+                st.image(rec["capa_url"], width=60)
+        with r2:
+            st.write(f"**{rec['titulo']}**")
+            st.caption(f"{rec['generos'] or ''} | Nota: {rec['nota']:.0f}" if rec["nota"] else rec["generos"] or "")
+
+
 def _search_animes(conn, name):
     pattern = f"%{name}%"
     return _query_df(conn,
@@ -169,16 +211,15 @@ if page == "Inicio":
 
     with col1:
         st.subheader("Top 10 Animes Mais Assistidos")
-        top10 = df.nlargest(10, "popularidade")[["titulo", "capa_url", "popularidade"]].reset_index(drop=True)
+        top10 = df.nlargest(10, "popularidade").reset_index(drop=True)
         for i in range(0, 10, 2):
             c_a, c_b = st.columns(2)
             for col_card, idx in zip([c_a, c_b], [i, i + 1]):
                 if idx < len(top10):
                     row = top10.iloc[idx]
                     with col_card:
-                        if row["capa_url"]:
-                            st.image(row["capa_url"], width=80)
-                        st.caption(f"#{idx+1} {row['titulo']}")
+                        with st.popover(f"#{idx+1} {row['titulo'][:22]}"):
+                            _render_anime_popup(row, df)
 
     with col2:
         st.subheader("Nota x Popularidade")
@@ -190,7 +231,7 @@ if page == "Inicio":
         st.plotly_chart(fig2, use_container_width=True)
 
     st.subheader("Top 5 Animes com Mais Episodios")
-    top5_eps = df[df["episodios"].notna()].nlargest(5, "episodios")[["titulo", "capa_url", "episodios"]].reset_index(drop=True)
+    top5_eps = df[df["episodios"].notna()].nlargest(5, "episodios").reset_index(drop=True)
     cols_eps = st.columns(5)
     for i, col_card in enumerate(cols_eps):
         if i < len(top5_eps):
@@ -198,8 +239,8 @@ if page == "Inicio":
             with col_card:
                 if row["capa_url"]:
                     st.image(row["capa_url"], use_container_width=True)
-                st.caption(f"**#{i+1}** {row['titulo']}")
-                st.caption(f"{int(row['episodios'])} eps")
+                with st.popover(f"#{i+1} {row['titulo'][:18]}"):
+                    _render_anime_popup(row, df)
 
 # ---------------------------------------------------------------------------
 # PAGINA: Ranking
