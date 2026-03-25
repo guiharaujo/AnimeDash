@@ -91,11 +91,24 @@ Repositório: https://github.com/guiharaujo/AnimeDash
 
 | Página | Descrição |
 |---|---|
-| Inicio | Métricas gerais + scatter nota×popularidade + distribuição por status |
+| Inicio | Métricas gerais + Top 10 mais assistidos (foto + popover) + scatter nota×popularidade + Top 5 episódios (foto + popover) |
 | Ranking | Tabela com capa, barra de progresso na nota, paginação de 50 em 50 |
 | Graficos | 3 abas: gêneros (barras + pizza), estúdios (bubble), ano/temporada (heatmap) |
 | Busca | Busca por nome (título ou título original) com cards expandíveis |
 | Recomendacoes | Cosine similarity em matriz gênero+tags → 10 animes similares |
+
+### Página Inicio — detalhes
+
+- **Top 10 Mais Assistidos**: exibe foto + botão clicável (popover) com nome. Ao clicar abre painel com: capa, episódios, nota, gêneros, estúdio, descrição (300 chars) e 1 anime recomendado por gênero
+- **Top 5 com Mais Episódios**: exibe foto + botão clicável com mesmo popover de detalhes
+- One Piece tem episódios corrigidos manualmente para 1122 (a AniList retorna NULL para séries em andamento)
+- Popover usa `_render_anime_popup(row, df)` — função helper definida antes do bloco `if page == "Inicio":`
+
+### Navegação
+
+- A navegação é feita por `st.radio` no sidebar (parte inferior) — NÃO usar pasta `pages/`
+- Streamlit auto-detecta `pages/` e cria links no topo do sidebar que ficam em branco (bug conhecido neste projeto)
+- `DATA_VERSION` em `main.py` força limpeza do session_state quando a estrutura de dados muda — incrementar ao alterar chaves do session_state
 
 ## Sistema de recomendação
 
@@ -104,6 +117,8 @@ Algoritmo implementado inline em `app/main.py` (página Recomendacoes):
 2. Constrói matriz de features: gêneros (peso=1.0) + tags (peso=rank/100)
 3. Cosine similarity: `sim = dot(A,B) / (|A| × |B|)` com numpy
 4. Retorna top 10 mais similares com % de similaridade
+
+Recomendação rápida no popover da página Inicio: 1 anime com maior sobreposição de gêneros (sem cosine similarity, por performance).
 
 ## AniList API
 

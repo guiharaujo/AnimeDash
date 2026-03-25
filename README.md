@@ -4,7 +4,7 @@ Dashboard interativo dos top 500 animes da [AniList](https://anilist.co), com si
 
 ## Funcionalidades
 
-- **Inicio** — estatísticas gerais, scatter nota × popularidade, distribuição por status
+- **Inicio** — métricas gerais, Top 10 animes mais assistidos com foto e popover de detalhes, scatter nota × popularidade, Top 5 animes com mais episódios com foto e popover
 - **Ranking** — top animes ordenados por nota ou popularidade, com capas e paginação
 - **Graficos** — análises por gênero, estúdio e ano/temporada (barras, pizza, heatmap)
 - **Busca** — busca por nome (romaji ou japonês) com cards detalhados
@@ -112,6 +112,8 @@ O ETL é **idempotente** — pode ser re-executado sem duplicar dados (usa MERGE
 
 ## Sistema de recomendação
 
+### Página Recomendacoes (completo)
+
 O algoritmo usa **cosine similarity ponderada**:
 
 1. Cada anime é representado por um vetor de features
@@ -119,6 +121,18 @@ O algoritmo usa **cosine similarity ponderada**:
 3. Tags têm peso proporcional ao **rank de relevância** (0–100) fornecido pela AniList
 4. A similaridade é calculada como: `sim(A,B) = dot(A,B) / (||A|| × ||B||)`
 5. Os 10 animes com maior similaridade são retornados
+
+### Popover da página Inicio (rápido)
+
+Ao clicar em qualquer anime no Top 10 ou Top 5 episódios, um painel abre com:
+- Capa, título original, episódios, nota, gêneros, estúdio
+- Descrição resumida (300 caracteres)
+- **1 anime recomendado** por maior sobreposição de gêneros
+
+### Dados corrigidos manualmente
+
+A AniList não registra total de episódios de séries em andamento. Correções aplicadas no banco:
+- **One Piece**: 1.122 episódios (março 2025)
 
 ## Fonte dos dados
 
